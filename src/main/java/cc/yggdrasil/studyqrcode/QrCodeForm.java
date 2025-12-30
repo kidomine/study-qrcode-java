@@ -7,15 +7,11 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import org.springframework.stereotype.Component;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
 
 @Component
 public class QrCodeForm
@@ -27,13 +23,13 @@ public class QrCodeForm
     private JPanel pnlPadding;
     private JPanel mainPanel;
     private JLabel lblQrCode;
+    private JPanel pnlInputData;
+    private JTextArea txtAreaInputData;
 
     public QrCodeForm()
     {
         btnClear.addActionListener(e ->
         {
-            System.out.println("Clear button clicked");
-
             disposeCurrentQrCode();
 
             lblQrCode.setIcon(null);
@@ -42,9 +38,7 @@ public class QrCodeForm
 
         btnGenerate.addActionListener(e ->
         {
-            System.out.println("Generate button clicked");
-            final String data = "timestamp: " + System.currentTimeMillis();
-            final BufferedImage qrCode = createQR(data, "UTF-8", 300, 300);
+            final BufferedImage qrCode = createQR(getInputData(), "UTF-8", 250, 250);
 
             final ImageIcon icon = new ImageIcon(qrCode);
             lblQrCode.setIcon(icon);
@@ -53,7 +47,7 @@ public class QrCodeForm
     }
 
     /**
-     * Dispose the current QR code image.
+     * Dispose of the current QR code image.
      */
     private void disposeCurrentQrCode()
     {
@@ -65,12 +59,27 @@ public class QrCodeForm
     }
 
     /**
+     * Get the input data to be encoded.
+     *
+     * @return the input data to be encoded
+     */
+    private String getInputData()
+    {
+        final HashMap<String, String> inputDataMap = new HashMap<>();
+
+        inputDataMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
+        inputDataMap.put("data", txtAreaInputData.getText());
+
+        return inputDataMap.toString();
+    }
+
+    /**
      * Create a QR code image.
      *
-     * @param data the data to be encoded
+     * @param data    the data to be encoded
      * @param charset the character set
-     * @param height the image height
-     * @param width the image width
+     * @param height  the image height
+     * @param width   the image width
      * @return the generated QR code image
      */
     private BufferedImage createQR(final String data, final String charset, int height, int width)
@@ -116,7 +125,7 @@ public class QrCodeForm
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
-        gbc.weighty = 8.0;
+        gbc.weighty = 7.0;
         gbc.fill = GridBagConstraints.BOTH;
         mainPanel.add(pnlQrCode, gbc);
         lblQrCode = new JLabel();
@@ -130,10 +139,10 @@ public class QrCodeForm
         pnlControls.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
-        gbc.weighty = 2.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         mainPanel.add(pnlControls, gbc);
         btnClear = new JButton();
         btnClear.setText("Clear");
@@ -155,11 +164,29 @@ public class QrCodeForm
         pnlPadding.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         mainPanel.add(pnlPadding, gbc);
+        pnlInputData = new JPanel();
+        pnlInputData.setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 2.5;
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(pnlInputData, gbc);
+        txtAreaInputData = new JTextArea();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 50, 0, 50);
+        pnlInputData.add(txtAreaInputData, gbc);
     }
 
     /** @noinspection ALL */
