@@ -1,17 +1,17 @@
 package cc.yggdrasil.studyqrcode;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
 import org.springframework.stereotype.Component;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.HashMap;
 
 @Component
 public class QrCodeForm
@@ -38,9 +38,11 @@ public class QrCodeForm
 
         btnGenerate.addActionListener(e ->
         {
-            final BufferedImage qrCode = createQR(getInputData(), "UTF-8", 250, 250);
-
+            final QrCodeGenerator qrCodeGenerator = new QrCodeGenerator();
+            final String data = qrCodeGenerator.makeQrCodeData(txtAreaInputData.getText());
+            final BufferedImage qrCode = qrCodeGenerator.createQR(data, "UTF-8", 250, 250);
             final ImageIcon icon = new ImageIcon(qrCode);
+
             lblQrCode.setIcon(icon);
             lblQrCode.repaint();
         });
@@ -56,48 +58,6 @@ public class QrCodeForm
             oldIcon.getImage()
                    .flush();
         }
-    }
-
-    /**
-     * Get the input data to be encoded.
-     *
-     * @return the input data to be encoded
-     */
-    private String getInputData()
-    {
-        final HashMap<String, String> inputDataMap = new HashMap<>();
-
-        inputDataMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-        inputDataMap.put("data", txtAreaInputData.getText());
-
-        return inputDataMap.toString();
-    }
-
-    /**
-     * Create a QR code image.
-     *
-     * @param data    the data to be encoded
-     * @param charset the character set
-     * @param height  the image height
-     * @param width   the image width
-     * @return the generated QR code image
-     */
-    private BufferedImage createQR(final String data, final String charset, int height, int width)
-    {
-        try
-        {
-            final BitMatrix matrix = new MultiFormatWriter().encode(
-                    new String(data.getBytes(charset), charset),
-                    BarcodeFormat.QR_CODE, width, height);
-
-            return MatrixToImageWriter.toBufferedImage(matrix);
-        }
-        catch (final WriterException | IOException caught)
-        {
-            System.err.println("Failed to generate QR code: " + caught.getMessage());
-        }
-
-        return null;
     }
 
     {
